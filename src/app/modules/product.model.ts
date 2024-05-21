@@ -66,12 +66,5 @@ productSchema.post('save', async function (next) {
   console.log(this, 'post hook:we will post data');
   // next();
 });
-// productSchema.pre('find', function (next) {
-//   this.find({ isDeleted: { $ne: true } }); //isDeleted true thakle data dibe na
-//   next();
-// });
-// productSchema.pre('findOne', function (next) {
-//   this.find({ isDeleted: { $ne: true } }); //isDeleted true thakle data dibe na
-//   next();
-// });
+
 export const Product = model<TProduct, ProductModel>('Product', productSchema);

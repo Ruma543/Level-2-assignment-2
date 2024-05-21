@@ -28,8 +28,30 @@ const getAllProduct = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: 'All product data get successfully',
+      count: result.length,
       data: result,
+      // data1: result.countDocuments(),
     });
+  } catch (err: any) {
+    // console.log(err);
+    res.status(500).json({
+      success: false,
+      message: err.message || 'something went wrong',
+      data: err,
+    });
+  }
+};
+const getSearchProduct = async (req: Request, res: Response) => {
+  try {
+    const search = req.query.searchTerm; //searchTerm is using for search
+
+    const query = search ? { name: { $regex: search, $options: 'i' } } : {};
+
+    // Execute the query
+    const products = await ProductService.getSearchProductDataFromDB(query);
+
+    // Send response
+    res.json(products);
   } catch (err: any) {
     // console.log(err);
     res.status(500).json({
@@ -42,10 +64,9 @@ const getAllProduct = async (req: Request, res: Response) => {
 const getSingleProduct = async (req: Request, res: Response) => {
   try {
     const { productId } = req.params;
-    // console.log(productId);
+
     const result = await ProductService.getSingleProductDataFromDB(productId);
-    // const result = await ProductService.getSingleProductDataFromDB(productId);
-    // console.log(result);
+
     res.status(200).json({
       success: true,
       message: 'Product fetched successfully!',
@@ -63,11 +84,11 @@ const getSingleProduct = async (req: Request, res: Response) => {
 const updateSingleProduct = async (req: Request, res: Response) => {
   try {
     const { productId } = req.params;
-    const data = req.body;
+    const data1 = req.body;
 
     const result = await ProductService.updateSingleProductDataFromDB(
       productId,
-      data
+      data1
     );
     if ((result as any).modifiedCount === 0) {
       return res.status(404).json({
@@ -79,6 +100,7 @@ const updateSingleProduct = async (req: Request, res: Response) => {
       success: true,
       message: 'product data update  successfully',
       data: result,
+      data1,
     });
   } catch (err: any) {
     // console.log(err);
@@ -94,10 +116,11 @@ const deleteSingleProduct = async (req: Request, res: Response) => {
     const { productId } = req.params;
     const result =
       await ProductService.deleteSingleProductDataFromDB(productId);
+
     res.status(200).json({
       success: true,
       message: 'Product deleted successfully!',
-      data: result,
+      data: null,
     });
   } catch (err: any) {
     // console.log(err);
@@ -114,4 +137,5 @@ export const ProductControllers = {
   getSingleProduct,
   updateSingleProduct,
   deleteSingleProduct,
+  getSearchProduct,
 };
