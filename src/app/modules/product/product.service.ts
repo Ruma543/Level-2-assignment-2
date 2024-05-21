@@ -8,13 +8,27 @@ const createProductIntoDB = async (productData: TProduct) => {
 
   return result;
 };
-const getAllProductDataFromDB = async () => {
-  const result = await Product.find();
-  return result;
-};
-const getSearchProductDataFromDB = async (query: string) => {
-  const result = await Product.find(query);
-  console.log(result);
+// const getAllProductDataFromDB = async () => {
+//   const result = await Product.find();
+//   return result;
+// };
+// const getSearchProductDataFromDB = async (query: any) => {
+//   const result = await Product.find(query);
+//   console.log(result);
+//   return result;
+// };
+
+const getProductDataFromDB = async (query?: any) => {
+  let result;
+
+  if (query) {
+    // If query is provided, perform a search query
+    result = await Product.find(query);
+  } else {
+    // If no query is provided, fetch all products
+    result = await Product.find();
+  }
+
   return result;
 };
 const getSingleProductDataFromDB = async (id: string) => {
@@ -40,9 +54,10 @@ const deleteSingleProductDataFromDB = async (id: string) => {
 };
 export const ProductService = {
   createProductIntoDB,
-  getAllProductDataFromDB,
+  getProductDataFromDB,
+  // getAllProductDataFromDB,
   getSingleProductDataFromDB,
   updateSingleProductDataFromDB,
   deleteSingleProductDataFromDB,
-  getSearchProductDataFromDB,
+  // getSearchProductDataFromDB,
 };

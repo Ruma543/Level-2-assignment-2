@@ -22,37 +22,64 @@ const createOrder = async (req: Request, res: Response) => {
     });
   }
 };
-const getAllOrder = async (req: Request, res: Response) => {
+// const getAllOrder = async (req: Request, res: Response) => {
+//   try {
+//     const result = await OrderService.getAllOrderDataFromDB();
+//     res.status(200).json({
+//       success: true,
+//       message: 'Orders fetched successfully!',
+//       count: result.length,
+//       data: result,
+//     });
+//   } catch (err: any) {
+//     // console.log(err);
+//     res.status(500).json({
+//       success: false,
+//       message: err.message || 'something went wrong',
+//       data: err,
+//     });
+//   }
+// };
+// const getSearchOrder = async (req: Request, res: Response) => {
+//   try {
+//     const search = req.query.email; //searchTerm is using for search
+
+//     const query = search ? { email: { $regex: search, $options: 'i' } } : {};
+
+//     // Execute the query
+//     const result = await OrderService.getSearchOrderDataFromDB(query);
+
+//     // Send response
+//     res.status(200).json({
+//       success: true,
+//       message: 'Orders fetched successfully for user email!',
+//       count: result.length,
+//       data: result,
+//     });
+//   } catch (err: any) {
+//     res.status(500).json({
+//       success: false,
+//       message: err.message || 'something went wrong',
+//       data: err,
+//     });
+//   }
+// };
+
+const getOrderData = async (req: Request, res: Response) => {
   try {
-    const result = await OrderService.getAllOrderDataFromDB();
+    const email = req.query.email as string | undefined;
+    const query = email
+      ? { email: { $regex: email, $options: 'i' } }
+      : undefined;
+
+    const result = await OrderService.getOrderDataFromDB(query);
+
+    const message = email
+      ? 'Orders fetched successfully for user email!'
+      : 'Orders fetched successfully!';
     res.status(200).json({
       success: true,
-      message: 'Orders fetched successfully!',
-      count: result.length,
-      data: result,
-    });
-  } catch (err: any) {
-    // console.log(err);
-    res.status(500).json({
-      success: false,
-      message: err.message || 'something went wrong',
-      data: err,
-    });
-  }
-};
-const getSearchOrder = async (req: Request, res: Response) => {
-  try {
-    const search = req.query.email; //searchTerm is using for search
-
-    const query = search ? { email: { $regex: search, $options: 'i' } } : {};
-
-    // Execute the query
-    const result = await OrderService.getSearchOrderDataFromDB(query);
-
-    // Send response
-    res.status(200).json({
-      success: true,
-      message: 'Orders fetched successfully for user email!',
+      message,
       count: result.length,
       data: result,
     });
@@ -66,6 +93,7 @@ const getSearchOrder = async (req: Request, res: Response) => {
 };
 export const OrderControllers = {
   createOrder,
-  getAllOrder,
-  getSearchOrder,
+  getOrderData,
+  // getAllOrder,
+  // getSearchOrder,
 };
