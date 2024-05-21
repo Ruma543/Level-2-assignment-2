@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import orderValidationSchema from './order.zodvalidation';
 import { OrderService } from './order.service';
 
+//order created data
 const createOrder = async (req: Request, res: Response) => {
   try {
     const order = req.body.order;
@@ -13,58 +14,17 @@ const createOrder = async (req: Request, res: Response) => {
       message: 'Order created successfully!',
       data: result,
     });
-  } catch (err: any) {
-    console.log(err);
+  } catch (err) {
+    const error = err as Error;
     res.status(500).json({
       success: false,
-      message: err.message || 'something went wrong',
-      data: err,
+      message: error.message || 'something went wrong',
+      data: error,
     });
   }
 };
-// const getAllOrder = async (req: Request, res: Response) => {
-//   try {
-//     const result = await OrderService.getAllOrderDataFromDB();
-//     res.status(200).json({
-//       success: true,
-//       message: 'Orders fetched successfully!',
-//       count: result.length,
-//       data: result,
-//     });
-//   } catch (err: any) {
-//     // console.log(err);
-//     res.status(500).json({
-//       success: false,
-//       message: err.message || 'something went wrong',
-//       data: err,
-//     });
-//   }
-// };
-// const getSearchOrder = async (req: Request, res: Response) => {
-//   try {
-//     const search = req.query.email; //searchTerm is using for search
 
-//     const query = search ? { email: { $regex: search, $options: 'i' } } : {};
-
-//     // Execute the query
-//     const result = await OrderService.getSearchOrderDataFromDB(query);
-
-//     // Send response
-//     res.status(200).json({
-//       success: true,
-//       message: 'Orders fetched successfully for user email!',
-//       count: result.length,
-//       data: result,
-//     });
-//   } catch (err: any) {
-//     res.status(500).json({
-//       success: false,
-//       message: err.message || 'something went wrong',
-//       data: err,
-//     });
-//   }
-// };
-
+//all order get and search by email order get data
 const getOrderData = async (req: Request, res: Response) => {
   try {
     const email = req.query.email as string | undefined;
@@ -74,26 +34,32 @@ const getOrderData = async (req: Request, res: Response) => {
 
     const result = await OrderService.getOrderDataFromDB(query);
 
+    if (result.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found',
+      });
+    }
+
     const message = email
       ? 'Orders fetched successfully for user email!'
       : 'Orders fetched successfully!';
     res.status(200).json({
       success: true,
       message,
-      count: result.length,
+      // count: result.length,
       data: result,
     });
-  } catch (err: any) {
+  } catch (err) {
+    const error = err as Error;
     res.status(500).json({
       success: false,
-      message: err.message || 'something went wrong',
-      data: err,
+      message: error.message || 'something went wrong',
+      data: error,
     });
   }
 };
 export const OrderControllers = {
   createOrder,
   getOrderData,
-  // getAllOrder,
-  // getSearchOrder,
 };

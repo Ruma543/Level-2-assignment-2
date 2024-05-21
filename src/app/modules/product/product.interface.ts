@@ -15,7 +15,6 @@ export type TProduct = {
   tags: string[];
   variants: TVariants[];
   inventory: TInventory;
-  isDeleted: boolean;
 };
 
 export interface ProductModel extends Model<TProduct> {

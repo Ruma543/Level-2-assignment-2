@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { ProductService } from './product.service';
 import productValidationSchema from './product.zodValidation';
-
+//create product data
 const createProduct = async (req: Request, res: Response) => {
   try {
     const product = req.body.product;
@@ -13,54 +13,18 @@ const createProduct = async (req: Request, res: Response) => {
       message: 'Product created successfully!',
       data: result,
     });
-  } catch (err: any) {
-    console.log(err);
+  } catch (err) {
+    const error = err as Error;
+    // console.log(err);
     res.status(500).json({
       success: false,
-      message: err.message || 'something went wrong',
-      data: err,
+      message: error.message || 'something went wrong',
+      data: error,
     });
   }
 };
-// const getAllProduct = async (req: Request, res: Response) => {
-//   try {
-//     const result = await ProductService.getAllProductDataFromDB();
-//     res.status(200).json({
-//       success: true,
-//       message: 'All product data get successfully',
-//       count: result.length,
-//       data: result,
-//       // data1: result.countDocuments(),
-//     });
-//   } catch (err: any) {
-//     // console.log(err);
-//     res.status(500).json({
-//       success: false,
-//       message: err.message || 'something went wrong',
-//       data: err,
-//     });
-//   }
-// };
-// const getSearchProduct = async (req: Request, res: Response) => {
-//   try {
-//     const search = req.query.searchTerm; //searchTerm is using for search
 
-//     const query = search ? { name: { $regex: search, $options: 'i' } } : {};
-
-//     // Execute the query
-//     const products = await ProductService.getSearchProductDataFromDB(query);
-
-//     // Send response
-//     res.json(products);
-//   } catch (err: any) {
-//     // console.log(err);
-//     res.status(500).json({
-//       success: false,
-//       message: err.message || 'something went wrong',
-//       data: err,
-//     });
-//   }
-// };
+//get all product data and search data
 const getProducts = async (req: Request, res: Response) => {
   try {
     const search = req.query.searchTerm as string; // Get the searchTerm query parameter if provided
@@ -72,43 +36,62 @@ const getProducts = async (req: Request, res: Response) => {
     // Fetch products using the combined service method
     const result = await ProductService.getProductDataFromDB(query);
 
+    if (result.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: search
+          ? `No products found matching the search term '${search}'`
+          : 'No products available',
+      });
+    }
+
     res.status(200).json({
       success: true,
       message: search
-        ? 'Search results fetched successfully'
-        : 'All product data fetched successfully',
-      count: result.length,
+        ? `Products matching search term '${search}' fetched successfully!`
+        : 'Products fetched successfully!',
+      // count: result.length,
       data: result,
     });
-  } catch (err: any) {
+  } catch (err) {
+    const error = err as Error;
     res.status(500).json({
       success: false,
-      message: err.message || 'Something went wrong',
-      data: err,
+      message: error.message || 'Something went wrong',
+      data: error,
     });
   }
 };
-
+//single product get data
 const getSingleProduct = async (req: Request, res: Response) => {
   try {
     const { productId } = req.params;
 
     const result = await ProductService.getSingleProductDataFromDB(productId);
 
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found',
+      });
+    }
+
     res.status(200).json({
       success: true,
       message: 'Product fetched successfully!',
       data: result,
     });
-  } catch (err: any) {
+  } catch (err) {
+    const error = err as Error;
     // console.log(err);
     res.status(500).json({
       success: false,
-      message: err.message || 'something went wrong',
-      data: err,
+      message: error.message || 'something went wrong',
+      data: error,
     });
   }
 };
+//update a single product
 const updateSingleProduct = async (req: Request, res: Response) => {
   try {
     const { productId } = req.params;
@@ -118,24 +101,24 @@ const updateSingleProduct = async (req: Request, res: Response) => {
       productId,
       data1
     );
-    if ((result as any).modifiedCount === 0) {
+    if (result.modifiedCount === 0) {
       return res.status(404).json({
         success: false,
-        message: 'product not found or no changes made',
+        message: 'product not found and no changes made',
       });
     }
     res.status(200).json({
       success: true,
       message: 'product data update  successfully',
-      data: result,
-      data1,
+      data: data1,
     });
-  } catch (err: any) {
+  } catch (err) {
+    const error = err as Error;
     // console.log(err);
     res.status(500).json({
       success: false,
-      message: err.message || 'something went wrong',
-      data: err,
+      message: error.message || 'something went wrong',
+      data: error,
     });
   }
 };
@@ -144,27 +127,27 @@ const deleteSingleProduct = async (req: Request, res: Response) => {
     const { productId } = req.params;
     const result =
       await ProductService.deleteSingleProductDataFromDB(productId);
-
+    console.log(result);
     res.status(200).json({
       success: true,
       message: 'Product deleted successfully!',
       data: null,
     });
-  } catch (err: any) {
+  } catch (err) {
+    const error = err as Error;
     // console.log(err);
     res.status(500).json({
       success: false,
-      message: err.message || 'something went wrong',
-      data: err,
+      message: error.message || 'something went wrong',
+      data: error,
     });
   }
 };
+//pass the controller data for further use
 export const ProductControllers = {
   createProduct,
   getProducts,
-  // getAllProduct,
   getSingleProduct,
   updateSingleProduct,
   deleteSingleProduct,
-  // getSearchProduct,
 };
