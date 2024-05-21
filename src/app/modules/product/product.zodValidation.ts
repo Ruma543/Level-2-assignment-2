@@ -13,12 +13,13 @@ const inventorySchema = z.object({
   }),
 });
 const productValidationSchema = z.object({
-  name: z.string().nonempty('name is required'),
-  description: z.string().nonempty('description is required'),
+  name: z.string(),
+  description: z.string(),
   price: z.number().min(0, 'price is required'),
-  category: z.string().nonempty('category is required'),
+  category: z.string(),
   tags: z.array(z.string().nonempty('tag is required')),
-  variants: z.array(variantSchema).nonempty('variants is required'),
+  variants: z.array(variantSchema),
   inventory: inventorySchema,
+  isDeleted: z.boolean(),
 });
 export default productValidationSchema;

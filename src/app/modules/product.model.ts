@@ -26,6 +26,7 @@ const productSchema = new Schema<TProduct, ProductModel>({
   name: {
     type: String,
     required: [true, 'name is required'],
+    unique: true,
   },
   description: {
     type: String,
@@ -51,6 +52,10 @@ const productSchema = new Schema<TProduct, ProductModel>({
     type: inventorySchema,
     required: [true, 'inventory is required'],
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 productSchema.pre('save', async function (next) {
@@ -59,5 +64,6 @@ productSchema.pre('save', async function (next) {
 });
 productSchema.post('save', async function (next) {
   console.log(this, 'post hook:we will post data');
+  // next();
 });
 export const Product = model<TProduct, ProductModel>('Product', productSchema);
