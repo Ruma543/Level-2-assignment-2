@@ -8,7 +8,7 @@
 
 ### To run the project : npm run start:dev
 
-### run the project locally in browser simply :http://localhost:5000/
+### run the project locally in browser simply :http://localhost:5000
 
 ### live site link: https://level-2-assignment-2-lac.vercel.app
 
