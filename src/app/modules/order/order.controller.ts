@@ -1,13 +1,46 @@
 import { Request, Response } from 'express';
 import orderValidationSchema from './order.zodvalidation';
 import { OrderService } from './order.service';
+import { ProductService } from '../product/product.service';
+import mongoose from 'mongoose';
 
 //order created data
 const createOrder = async (req: Request, res: Response) => {
   try {
     const order = req.body.order;
     const zodData = orderValidationSchema.parse(order);
+
+    if (!mongoose.Types.ObjectId.isValid(zodData.productId)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid product ID: ${zodData.productId}`,
+      });
+    }
+
+    const product = await ProductService.getSingleProductDataFromDB(
+      zodData.productId
+    );
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found',
+      });
+    }
+    if (product.inventory.quantity < zodData.quantity) {
+      return res.status(400).json({
+        success: false,
+        message: 'Insufficient quantity available in inventory',
+      });
+    }
     const result = await OrderService.createOrderIntoDB(zodData);
+
+    // Update the product quantity
+    // product.inventory.quantity -= zodData.quantity;
+    await ProductService.updateProductQuantity(
+      zodData.productId,
+      zodData.quantity
+      // product.inventory.quantity
+    );
 
     res.status(200).json({
       success: true,

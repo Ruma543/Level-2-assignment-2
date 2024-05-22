@@ -6,15 +6,6 @@ const createOrderIntoDB = async (orderData: TOrder) => {
 
   return result;
 };
-// const getAllOrderDataFromDB = async () => {
-//   const result = await Order.find();
-//   return result;
-// };
-// const getSearchOrderDataFromDB = async (query: string) => {
-//   const result = await Order.find(query);
-//   console.log(result);
-//   return result;
-// };
 
 const getOrderDataFromDB = async (query?: any) => {
   let result;
@@ -30,6 +21,4 @@ const getOrderDataFromDB = async (query?: any) => {
 export const OrderService = {
   createOrderIntoDB,
   getOrderDataFromDB,
-  // getAllOrderDataFromDB,
-  // getSearchOrderDataFromDB,
 };

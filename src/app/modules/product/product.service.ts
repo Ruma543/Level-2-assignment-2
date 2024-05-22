@@ -1,4 +1,5 @@
 // import { query } from 'express';
+import mongoose from 'mongoose';
 import { Product } from '../product.model';
 import { TProduct } from './product.interface';
 
@@ -25,6 +26,31 @@ const getSingleProductDataFromDB = async (id: string) => {
   // console.log(result);
   return result;
 };
+//for update the product quantity and instock status after create an order
+const updateProductQuantity = async (
+  productId: string,
+  newQuantity: number
+) => {
+  if (!mongoose.Types.ObjectId.isValid(productId)) {
+    throw new Error(`Invalid product ID: ${productId}`);
+  }
+  // Find the product to get the current quantity
+  const product = await Product.findById(productId);
+  if (!product) {
+    throw new Error('Product not found');
+  }
+
+  // Calculate new quantity
+  const Quantity = product.inventory.quantity - newQuantity;
+  const inStock = Quantity > 0;
+  //update quantity and in stock
+  return await Product.findByIdAndUpdate(
+    productId,
+    { 'inventory.quantity': Quantity, 'inventory.inStock': inStock },
+    { new: true }
+  );
+};
+
 const updateSingleProductDataFromDB = async (id: string, data: any) => {
   const result = await Product.updateOne(
     { _id: id },
@@ -44,4 +70,5 @@ export const ProductService = {
   getSingleProductDataFromDB,
   updateSingleProductDataFromDB,
   deleteSingleProductDataFromDB,
+  updateProductQuantity,
 };
